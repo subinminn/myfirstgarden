@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My First Garden</title>
+<meta name="apple-mobile-web-app-title" content="My First Garden">
+<meta name="application-name" content="My First Garden">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2d1f0e">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --soil: #2d1f0e;
+    --soil-mid: #4a3520;
+    --soil-light: #7a5c38;
+    --leaf: #3d6b35;
+    --leaf-bright: #6aab5e;
+    --leaf-pale: #b8d9a8;
+    --sun: #e8a030;
+    --sun-pale: #f5d98a;
+    --tomato: #c94030;
+    --paper: #f5f0e8;
+    --paper-dark: #e8e0d0;
+    --ink: #1a1208;
+    --muted: #7a6a50;
+    --accent: #9b4f1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Gowun Dodum', serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, #e8d5b0 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, #d4c89a 0%, transparent 50%);
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 999;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.35;
+  }
+
+  header {
+    padding: 24px 40px 18px;
+    border-bottom: 2px solid var(--soil-light);
+    background: linear-gradient(to bottom, #ede4d0, transparent);
+  }
+  .header-top { display: flex; align-items: baseline; gap: 16px; margin-bottom: 14px; }
+  header h1 {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 28px; font-weight: 700;
+    color: var(--soil);
+    letter-spacing: -0.5px;
+  }
+  .header-sub { font-size: 13px; color: var(--muted); }
+
+  /* Settings bar */
+  .settings-bar { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+  .setting-group { display: flex; align-items: center; gap: 8px; }
+  .setting-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+  .setting-input {
+    font-family: 'Gowun Dodum', serif;
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1.5px solid var(--soil-light);
+    border-radius: 5px;
+    background: rgba(255,255,255,0.7);
+    color: var(--ink);
+    min-width: 110px;
+  }
+  .setting-input:focus { outline: none; border-color: var(--soil); background: white; }
+  .setting-btn {
+    font-family: 'Gowun Dodum', serif;
+    font-size: 12px;
+    padding: 6px 14px;
+    background: var(--soil);
+    color: var(--paper);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .setting-btn:hover { background: var(--soil-mid); }
+  .setting-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .setting-display {
+    font-size: 12px;
+    color: var(--soil);
+    background: rgba(255,255,255,0.6);
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--soil-light);
+  }
+  .setting-display strong { color: var(--soil); }
+
+  .app { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 145px); }
+
+  .sidebar {
+    border-right: 2px solid var(--soil-light);
+    padding: 20px 18px;
+    background: linear-gradient(to bottom, #ede4d0 0%, var(--paper) 100%);
+    overflow-y: auto;
+    max-height: calc(100vh - 145px);
+  }
+  .sidebar-title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 12px; font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+
+  /* Search */
+  .search-wrap { position: relative; margin-bottom: 12px; }
+  .search-input {
+    width: 100%;
+    font-family: 'Gowun Dodum', serif;
+    font-size: 12px;
+    padding: 7px 30px 7px 10px;
+    border: 1.5px solid var(--soil-light);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.7);
+    color: var(--ink);
+  }
+  .search-input:focus { outline: none; border-color: var(--soil); background: white; }
+  .search-icon {
+    position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
+    font-size: 12px; color: var(--muted); pointer-events: none;
+  }
+  .search-results {
+    margin-top: 6px;
+    background: white;
+    border: 1.5px solid var(--soil-light);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 2px 2px 0 var(--soil-light);
+  }
+  .search-result-item {
+    padding: 8px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--paper-dark);
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 6px;
+  }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item:hover { background: var(--paper); }
+  .search-result-item .add-icon { color: var(--leaf); font-weight: 700; }
+  .search-empty {
+    padding: 12px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    border-top: 1px dashed var(--soil-light);
+    margin-top: 6px;
+  }
+  .add-custom-btn {
+    width: 100%;
+    margin-top: 8px;
+    font-family: 'Gowun Dodum', serif;
+    font-size: 11px;
+    padding: 7px;
+    background: rgba(255,255,255,0.4);
+    border: 1.5px dashed var(--soil-light);
+    border-radius: 6px;
+    color: var(--soil);
+    cursor: pointer;
+  }
+  .add-custom-btn:hover { background: rgba(255,255,255,0.8); border-style: solid; }
+
+  .veg-card {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    margin-bottom: 5px;
+    transition: all 0.18s;
+    background: rgba(255,255,255,0.4);
+  }
+  .veg-card:hover { background: rgba(255,255,255,0.7); border-color: var(--soil-light); }
+  .veg-card.selected { background: rgba(255,255,255,0.85); border-color: var(--soil-mid); box-shadow: 2px 2px 0 var(--soil-light); }
+  .veg-card .icon { font-size: 18px; flex-shrink: 0; }
+  .veg-card .info { flex: 1; min-width: 0; }
+  .veg-card .name { font-size: 12px; font-weight: 500; color: var(--ink); }
+  .veg-card .sub { font-size: 10px; color: var(--muted); }
+  .veg-card .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .veg-card .delete-x {
+    font-size: 13px; color: var(--muted); cursor: pointer;
+    padding: 2px 5px; border-radius: 3px;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .veg-card:hover .delete-x { opacity: 1; }
+  .veg-card .delete-x:hover { background: var(--tomato); color: white; }
+  .badge-easy { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #ddf0d0; color: #2d5c20; margin-left: 3px; }
+  .badge-med  { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #faeeda; color: #7a4a10; margin-left: 3px; }
+  .badge-custom { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; background: #e0d8f0; color: #4a3580; margin-left: 3px; }
+
+  .divider { height: 1px; background: var(--soil-light); opacity: 0.3; margin: 14px 0; }
+
+  .tip-panel {
+    background: rgba(255,255,255,0.5);
+    border: 1.5px solid var(--soil-light);
+    border-radius: 7px;
+    padding: 11px 12px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--soil-mid);
+    min-height: 70px;
+  }
+  .tip-panel strong { color: var(--soil); display: block; margin-bottom: 4px; }
+
+  .main { display: flex; flex-direction: column; }
+
+  .tabs {
+    display: flex; gap: 0;
+    border-bottom: 2px solid var(--soil-light);
+    background: linear-gradient(to bottom, #ede4d0, var(--paper));
+    padding: 0 24px;
+  }
+  .tab-btn {
+    padding: 13px 20px;
+    font-family: 'Gowun Dodum', serif;
+    font-size: 13px;
+    border: none; background: none; cursor: pointer;
+    color: var(--muted);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--soil); }
+  .tab-btn.active { color: var(--soil); border-bottom-color: var(--soil); font-weight: 500; }
+
+  .tab-content { flex: 1; padding: 24px 28px; display: none; }
+  .tab-content.active { display: block; }
+
+  .plot-area-wrap { display: flex; gap: 28px; align-items: flex-start; }
+  .plot-left { flex: 1; min-width: 0; }
+  .plot-right { width: 220px; flex-shrink: 0; }
+
+  .palette-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 7px; }
+  .palette { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; min-height: 30px; }
+  .palette-chip {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 2px solid transparent;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+  .palette-chip:hover { background: rgba(255,255,255,0.8); }
+  .palette-chip.active { background: rgba(255,255,255,0.9); box-shadow: 2px 2px 0 var(--soil-light); }
+
+  .north-label { text-align: center; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .plot-grid-wrap { display: flex; gap: 6px; align-items: center; }
+  .side-label { writing-mode: vertical-rl; font-size: 10px; color: var(--muted); text-align: center; }
+
+  .plot-grid {
+    flex: 1;
+    display: grid;
+    gap: 5px;
+    background: var(--soil);
+    padding: 10px;
+    border-radius: 10px;
+    border: 3px solid var(--soil-mid);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.4), 4px 4px 0 var(--soil-mid);
+    transition: all 0.3s;
+  }
+  .cell {
+    aspect-ratio: 1;
+    border-radius: 5px;
+    border: 1.5px dashed rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.12s;
+    background: rgba(0,0,0,0.15);
+    position: relative;
+    user-select: none;
+  }
+  .cell:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.08); }
+  .cell.filled { border-style: solid; }
+  .cell .cell-remove {
+    display: none;
+    position: absolute; top: -7px; right: -7px;
+    width: 17px; height: 17px; border-radius: 50%;
+    background: var(--tomato); color: white;
+    font-size: 11px; font-weight: 700;
+    align-items: center; justify-content: center;
+    cursor: pointer; z-index: 5;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    line-height: 1;
+  }
+  .cell.filled:hover .cell-remove { display: flex; }
+  .south-label { text-align: center; font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  .plot-legend { margin-top: 18px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; font-size: 12px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .companion-card {
+    background: rgba(255,255,255,0.5);
+    border: 1.5px solid var(--soil-light);
+    border-radius: 8px;
+    padding: 13px;
+    margin-bottom: 11px;
+  }
+  .companion-card h4 { font-size: 12px; font-weight: 500; color: var(--soil); margin-bottom: 8px; }
+  .companion-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-bottom: 4px; line-height: 1.4; }
+  .good { color: #3d6b35; font-weight: 700; } .bad { color: #c94030; font-weight: 700; }
+
+  .plot-size-display {
+    background: rgba(255,255,255,0.6);
+    border: 1.5px solid var(--soil-light);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--soil);
+    margin-bottom: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .plot-size-display strong { font-family: 'Nanum Myeongjo', serif; }
+
+  /* Harvest table */
+  .harvest-table { width: 100%; border-collapse: collapse; }
+  .harvest-table th {
+    text-align: left; font-size: 11px; font-weight: 500;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
+    padding: 0 0 10px; border-bottom: 1px solid var(--paper-dark);
+  }
+  .harvest-row-tr { border-bottom: 1px solid var(--paper-dark); }
+  .harvest-row-tr td { padding: 11px 0; vertical-align: middle; }
+  .h-name-cell { display: flex; align-items: center; gap: 8px; }
+  .h-icon { font-size: 18px; }
+  .h-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .h-eng { font-size: 11px; color: var(--muted); }
+  .h-bar-wrap { width: 100%; height: 10px; background: var(--paper-dark); border-radius: 5px; overflow: hidden; }
+  .h-bar { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
+  .h-days { font-size: 13px; font-weight: 500; color: var(--soil); white-space: nowrap; padding-left: 12px; }
+  .h-date { font-size: 11px; color: var(--muted); white-space: nowrap; padding-left: 10px; }
+
+  /* Calendar tab */
+  .calendar-section { margin-bottom: 24px; }
+  .calendar-section h3 {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--soil); margin-bottom: 12px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--soil-light);
+  }
+  .frost-display {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    background: rgba(255,255,255,0.5);
+    border: 1.5px solid var(--soil-light);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .frost-stat { flex: 1; min-width: 130px; }
+  .frost-stat .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 3px; }
+  .frost-stat .value { font-family: 'Nanum Myeongjo', serif; font-size: 17px; font-weight: 700; color: var(--soil); }
+
+  .timeline {
+    background: rgba(255,255,255,0.4);
+    border: 1.5px solid var(--soil-light);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+  }
+  .timeline-row { display: grid; grid-template-columns: 130px 1fr; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px dotted var(--paper-dark); }
+  .timeline-row:last-child { border-bottom: none; }
+  .timeline-name { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink); }
+  .timeline-name .icon { font-size: 16px; }
+  .timeline-bar-wrap { position: relative; height: 22px; background: var(--paper-dark); border-radius: 4px; overflow: visible; }
+  .timeline-bar { position: absolute; height: 100%; border-radius: 4px; opacity: 0.3; }
+  .timeline-bar.harvest-bar { opacity: 0.8; }
+  .timeline-month-labels { display: grid; grid-template-columns: 130px 1fr; gap: 12px; margin-bottom: 6px; }
+  .timeline-months { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); padding: 0 2px; }
+  .timeline-legend { display: flex; gap: 14px; font-size: 11px; color: var(--muted); margin-top: 10px; }
+  .timeline-legend-item { display: flex; align-items: center; gap: 5px; }
+  .timeline-legend-swatch { width: 14px; height: 10px; border-radius: 2px; }
+
+  .stats-bar {
+    display: flex; gap: 0;
+    border-top: 2px solid var(--soil-light);
+    background: linear-gradient(to top, #ede4d0, var(--paper));
+    padding: 9px 32px;
+  }
+  .stat { flex: 1; text-align: center; padding: 5px; border-right: 1px solid var(--soil-light); }
+  .stat:last-child { border-right: none; }
+  .stat-val { font-family: 'Nanum Myeongjo', serif; font-size: 18px; font-weight: 700; color: var(--soil); }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .empty-msg { font-size: 12px; color: var(--muted); text-align: center; padding: 30px; }
+  .section-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px; line-height: 1.6; }
+
+  /* Modal */
+  .modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(45, 31, 14, 0.5);
+    z-index: 1000; align-items: center; justify-content: center;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal {
+    background: var(--paper);
+    border: 2px solid var(--soil-light);
+    border-radius: 10px;
+    padding: 24px;
+    width: 380px;
+    max-width: 90vw;
+    box-shadow: 5px 5px 0 var(--soil-mid);
+  }
+  .modal h3 { font-family: 'Nanum Myeongjo', serif; font-size: 16px; color: var(--soil); margin-bottom: 16px; }
+  .modal-row { margin-bottom: 12px; }
+  .modal-row label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .modal-row input, .modal-row select {
+    width: 100%;
+    font-family: 'Gowun Dodum', serif;
+    font-size: 13px;
+    padding: 7px 10px;
+    border: 1.5px solid var(--soil-light);
+    border-radius: 5px;
+    background: white;
+    color: var(--ink);
+  }
+  .modal-row input:focus, .modal-row select:focus { outline: none; border-color: var(--soil); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+  .modal-btn {
+    font-family: 'Gowun Dodum', serif;
+    font-size: 12px; padding: 7px 16px;
+    border-radius: 5px; cursor: pointer; border: 1.5px solid var(--soil-light);
+  }
+  .modal-btn.primary { background: var(--soil); color: var(--paper); border-color: var(--soil); }
+  .modal-btn.secondary { background: white; color: var(--soil); }
+
+  .icon-picker { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin-top: 4px; }
+  .icon-option {
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    background: white;
+    border: 1.5px solid var(--paper-dark);
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .icon-option:hover { border-color: var(--soil-light); }
+  .icon-option.selected { border-color: var(--soil); background: var(--paper-dark); }
+
+  @keyframes popIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .cell.filled .emoji { animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1); display: block; }
+
+  .loading-pulse { display: inline-block; animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+  /* Hamburger toggle - hidden by default (desktop) */
+  .menu-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--soil);
+    color: var(--paper);
+    border: 2px solid var(--soil-mid);
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(45,31,14,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+  .menu-toggle .badge-num {
+    position: absolute;
+    top: -4px; right: -4px;
+    background: var(--tomato); color: white;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--paper);
+  }
+  .sidebar-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(45,31,14,0.5);
+    z-index: 90;
+  }
+
+  /* ============ MOBILE / TABLET (≤ 900px) ============ */
+  @media (max-width: 900px) {
+    /* Header — compact */
+    header { padding: 14px 16px 12px; }
+    .header-top { gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    header h1 { font-size: 22px; }
+    .header-sub { font-size: 11px; }
+
+    /* Settings bar — stack vertically, full width inputs */
+    .settings-bar { gap: 8px; flex-direction: column; align-items: stretch; }
+    .setting-group { flex-wrap: wrap; gap: 6px; }
+    .setting-label { font-size: 10px; flex-basis: 100%; }
+    .setting-input { flex: 1; min-width: 0; font-size: 12px; padding: 7px 9px; }
+    .setting-btn { font-size: 11px; padding: 7px 12px; }
+    .setting-display { font-size: 11px; line-height: 1.5; padding: 7px 10px; }
+
+    /* App layout — single column */
+    .app { grid-template-columns: 1fr; min-height: auto; }
+
+    /* Sidebar — slide-in drawer */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 85%; max-width: 320px;
+      z-index: 95;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+      max-height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-backdrop.show { display: block; }
+
+    /* Floating toggle button */
+    .menu-toggle { display: flex; }
+
+    /* Tabs — horizontal scroll if needed */
+    .tabs { padding: 0 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab-btn { padding: 12px 14px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+
+    /* Tab content — less padding */
+    .tab-content { padding: 16px 14px; }
+
+    /* Plot tab — stack the plot + companion cards */
+    .plot-area-wrap { flex-direction: column; gap: 18px; }
+    .plot-right { width: 100%; }
+
+    /* Plot grid — keep cells touchable */
+    .plot-grid { padding: 7px; gap: 4px; }
+    .cell { font-size: 18px; min-height: 38px; }
+    .cell .cell-remove { width: 22px; height: 22px; font-size: 13px; top: -8px; right: -8px; }
+
+    .plot-size-display { flex-direction: column; align-items: flex-start; gap: 4px; font-size: 11px; }
+
+    /* Side labels less prominent */
+    .side-label { font-size: 9px; }
+    .north-label, .south-label { font-size: 10px; }
+
+    /* Palette chips — bigger touch targets */
+    .palette-chip { padding: 7px 12px; font-size: 13px; }
+
+    /* Calendar tab */
+    .frost-display { gap: 10px; padding: 12px; }
+    .frost-stat { min-width: 100px; flex: 1 1 45%; }
+    .frost-stat .value { font-size: 14px; }
+    .frost-stat .label { font-size: 9px; }
+    .timeline { padding: 10px 6px; }
+    .timeline-row { grid-template-columns: 80px 1fr; gap: 8px; }
+    .timeline-name { font-size: 11px; gap: 4px; }
+    .timeline-name .icon { font-size: 14px; }
+    .timeline-month-labels { grid-template-columns: 80px 1fr; gap: 8px; }
+    .timeline-months { font-size: 8px; }
+    .timeline-bar-wrap { height: 18px; }
+    .timeline-legend { gap: 10px; font-size: 10px; flex-wrap: wrap; }
+
+    /* Harvest table — stack rows as cards */
+    .harvest-table thead { display: none; }
+    .harvest-table, .harvest-table tbody, .harvest-row-tr, .harvest-table td { display: block; width: 100%; }
+    .harvest-row-tr {
+      background: rgba(255,255,255,0.5);
+      border: 1.5px solid var(--soil-light);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .harvest-row-tr td { padding: 4px 0; border: none; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .harvest-row-tr td:first-child { padding-bottom: 8px; border-bottom: 1px solid var(--paper-dark); margin-bottom: 6px; }
+    .harvest-row-tr td:not(:first-child)::before {
+      content: attr(data-label);
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .h-bar-wrap { max-width: 50%; }
+    .h-days, .h-date { padding-left: 0; font-size: 12px; }
+
+    /* Tips tab — single column */
+    .tab-content .tips-grid { grid-template-columns: 1fr !important; }
+
+    /* Stats bar — slightly smaller */
+    .stats-bar { padding: 8px 14px; }
+    .stat-val { font-size: 16px; }
+    .stat-label { font-size: 9px; }
+
+    /* Modal — better mobile fit */
+    .modal { width: 92vw; padding: 18px; }
+    .modal h3 { font-size: 14px; margin-bottom: 12px; }
+    .icon-picker { grid-template-columns: repeat(7, 1fr); }
+    .modal-row input, .modal-row select { font-size: 14px; padding: 8px 10px; }
+
+    /* Search input — bigger touch */
+    .search-input { font-size: 13px; padding: 9px 30px 9px 11px; }
+    .search-result-item { padding: 10px; font-size: 13px; }
+    .veg-card { padding: 10px 11px; }
+    .veg-card .delete-x { opacity: 1; padding: 4px 8px; font-size: 16px; }
+  }
+
+  /* ============ SMALL PHONES (≤ 480px) ============ */
+  @media (max-width: 480px) {
+    header { padding: 12px 12px 10px; }
+    header h1 { font-size: 20px; }
+    .header-sub { display: none; }
+    .tab-btn { padding: 11px 12px; font-size: 11px; }
+    .tab-content { padding: 14px 10px; }
+    .plot-grid { padding: 6px; gap: 3px; }
+    .cell { font-size: 16px; }
+    .frost-stat { flex: 1 1 100%; }
+    .timeline-row { grid-template-columns: 65px 1fr; }
+    .timeline-name { font-size: 10px; }
+    .stats-bar { padding: 6px 10px; }
+    .stat { padding: 4px 2px; }
+    .stat-val { font-size: 14px; }
+    .stat-label { font-size: 8px; }
+    .menu-toggle { width: 50px; height: 50px; bottom: 16px; right: 16px; font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="toggleSidebar()" aria-label="채소 메뉴 열기">
+  🌱<span class="badge-num" id="menu-badge">0</span>
+</button>
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+<header>
+  <div class="header-top">
+    <h1>🌱 My First Garden</h1>
+    <span class="header-sub">Community Garden Planner</span>
+  </div>
+  <div class="settings-bar">
+    <div class="setting-group">
+      <span class="setting-label">📍 우편번호</span>
+      <input type="text" id="zip-input" class="setting-input" placeholder="예: 48104" maxlength="5" />
+      <button class="setting-btn" id="zip-btn" onclick="lookupZip()">설정</button>
+    </div>
+    <div class="setting-group">
+      <span class="setting-label">📐 텃밭 크기</span>
+      <select id="size-select" class="setting-input" onchange="changePlotSize()">
+        <option value="3x4">3 × 4 (Quarter, ~1.2m × 1.2m)</option>
+        <option value="4x4">4 × 4 (~1.6m × 1.2m)</option>
+        <option value="6x4" selected>6 × 4 (Half, ~2.4m × 1.8m)</option>
+        <option value="6x6">6 × 6 (~2.4m × 2.4m)</option>
+        <option value="8x6">8 × 6 (Full, ~3.2m × 2.4m)</option>
+        <option value="10x8">10 × 8 (Large, ~4m × 3.2m)</option>
+      </select>
+    </div>
+    <div class="setting-display" id="location-display">
+      위치 미설정 — 기본값: Michigan (마지막 서리 5/10, 첫 서리 10/15)
+    </div>
+  </div>
+</header>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-title">채소 검색 / 추가</div>
+    <div class="search-wrap">
+      <input type="text" id="search-input" class="search-input" placeholder="채소·허브 이름 검색..." oninput="onSearch()" />
+      <span class="search-icon">🔍</span>
+    </div>
+    <div id="search-results"></div>
+    <button class="add-custom-btn" onclick="openCustomModal()">＋ 직접 추가하기</button>
+
+    <div class="divider"></div>
+
+    <div class="sidebar-title">선택한 채소 (<span id="sel-count">0</span>)</div>
+    <div id="veg-list"></div>
+
+    <div class="divider"></div>
+
+    <div class="sidebar-title">재배 팁</div>
+    <div class="tip-panel" id="tip-panel">
+      채소를 클릭하면 상세 팁이 표시돼요.
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('plot')">텃밭 배치</button>
+      <button class="tab-btn" onclick="showTab('calendar')">심기 달력</button>
+      <button class="tab-btn" onclick="showTab('harvest')">수확 일정</button>
+      <button class="tab-btn" onclick="showTab('tips')">재배 가이드</button>
+    </div>
+
+    <!-- Plot Tab -->
+    <div id="tab-plot" class="tab-content active">
+      <div class="plot-area-wrap">
+        <div class="plot-left">
+          <div class="plot-size-display">
+            <span>현재 텃밭: <strong id="size-label">6 × 4</strong> · 총 <strong id="cell-count">24</strong>칸 · 약 <strong id="size-meters">2.4m × 1.8m</strong></span>
+            <span style="font-size:11px;color:var(--muted)">(상단 우편번호 옆에서 변경)</span>
+          </div>
+          <p class="section-sub">채소를 선택한 뒤 아래 텃밭 칸을 클릭해서 배치하세요. 배치된 채소를 클릭하면 제거할 수 있어요.</p>
+
+          <div class="palette-title">선택한 채소 (클릭 후 텃밭에 심기)</div>
+          <div class="palette" id="palette"></div>
+
+          <div class="north-label">☀️ 북쪽 (햇빛 방향) — 키 큰 채소 배치 권장</div>
+          <div class="plot-grid-wrap">
+            <div class="side-label" id="left-label">1.8m</div>
+            <div class="plot-grid" id="plot-grid"></div>
+            <div class="side-label">↕</div>
+          </div>
+          <div class="south-label">남쪽 — 작은 채소 & 허브</div>
+
+          <div class="plot-legend" id="plot-legend"></div>
+        </div>
+
+        <div class="plot-right">
+          <div class="companion-card">
+            <h4>🤝 궁합 좋은 조합</h4>
+            <div class="companion-row"><span class="good">✓</span> 토마토 + 바질</div>
+            <div class="companion-row"><span class="good">✓</span> 오이 + 상추</div>
+            <div class="companion-row"><span class="good">✓</span> 시금치 + 애호박</div>
+            <div class="companion-row"><span class="good">✓</span> 당근 + 양파</div>
+          </div>
+          <div class="companion-card">
+            <h4>⚠️ 주의할 조합</h4>
+            <div class="companion-row"><span class="bad">✗</span> 민트 — 단독 화분 권장</div>
+            <div class="companion-row"><span class="bad">✗</span> 피망 + 할라피뇨 (교차수분)</div>
+            <div class="companion-row"><span class="bad">✗</span> 양배추 + 토마토</div>
+          </div>
+          <div class="companion-card">
+            <h4>📐 배치 공간 기준</h4>
+            <div class="companion-row">토마토: 60cm 간격</div>
+            <div class="companion-row">오이: 40cm + 지지대</div>
+            <div class="companion-row">애호박: 90cm (크게 퍼짐)</div>
+            <div class="companion-row">상추·허브: 20-30cm</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar Tab -->
+    <div id="tab-calendar" class="tab-content">
+      <div class="calendar-section">
+        <h3>📍 내 지역 서리 정보</h3>
+        <div class="frost-display">
+          <div class="frost-stat">
+            <div class="label">위치</div>
+            <div class="value" id="cal-location">Michigan (기본값)</div>
+          </div>
+          <div class="frost-stat">
+            <div class="label">USDA 존</div>
+            <div class="value" id="cal-zone">6a</div>
+          </div>
+          <div class="frost-stat">
+            <div class="label">마지막 서리 (봄)</div>
+            <div class="value" id="cal-last-frost">5월 10일</div>
+          </div>
+          <div class="frost-stat">
+            <div class="label">첫 서리 (가을)</div>
+            <div class="value" id="cal-first-frost">10월 15일</div>
+          </div>
+          <div class="frost-stat">
+            <div class="label">재배 시즌</div>
+            <div class="value" id="cal-season">약 158일</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calendar-section">
+        <h3>📅 채소별 심기·수확 타임라인</h3>
+        <p class="section-sub">선택한 채소의 권장 심기 시기, 수확 시작·종료 시기를 한눈에 볼 수 있어요. 우편번호를 입력하면 해당 지역에 맞춰 자동 조정돼요.</p>
+        <div id="timeline-container">
+          <div class="empty-msg">← 왼쪽에서 채소를 먼저 선택하세요</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Harvest Tab -->
+    <div id="tab-harvest" class="tab-content">
+      <p class="section-sub">권장 이식일 기준 예상 수확 시기예요. <span id="harvest-frost-info">우편번호 미설정 — 기본값 5/10 사용</span></p>
+      <table class="harvest-table">
+        <thead>
+          <tr>
+            <th style="width:170px">채소</th>
+            <th>수확까지</th>
+            <th style="width:75px">기간</th>
+            <th style="width:120px">권장 심기일</th>
+            <th style="width:120px">예상 첫 수확</th>
+            <th style="width:120px">마지막 수확</th>
+          </tr>
+        </thead>
+        <tbody id="harvest-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Tips Tab -->
+    <div id="tab-tips" class="tab-content">
+      <div class="tips-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
+        <div class="companion-card" style="margin:0">
+          <h4 style="font-size:14px;font-family:'Nanum Myeongjo',serif">📅 내 지역 심기 달력</h4>
+          <div id="tips-calendar" style="font-size:12px;line-height:1.9;color:var(--muted)">
+            우편번호 입력 후 자동 생성돼요.
+          </div>
+        </div>
+        <div class="companion-card" style="margin:0">
+          <h4 style="font-size:14px;font-family:'Nanum Myeongjo',serif">💧 물 주기 가이드</h4>
+          <ul style="font-size:12px;line-height:1.9;color:var(--muted);padding-left:16px">
+            <li>주 2-3회, 아침에 주는 게 최적</li>
+            <li>흙 5cm 깊이가 마르면 물 주기</li>
+            <li>잎에 직접 물 주면 곰팡이 위험</li>
+            <li>토마토는 뿌리 주변에 깊게</li>
+            <li>멀칭(짚·나뭇조각)으로 수분 유지</li>
+          </ul>
+        </div>
+        <div class="companion-card" style="margin:0">
+          <h4 style="font-size:14px;font-family:'Nanum Myeongjo',serif">🌿 초보자 실수 TOP 5</h4>
+          <ul style="font-size:12px;line-height:1.9;color:var(--muted);padding-left:16px">
+            <li>너무 많이 심기 — 4-6종이 적당</li>
+            <li>지지대 안 세우기 — 토마토·오이 필수</li>
+            <li>물을 너무 자주 주기 — 과습이 더 위험</li>
+            <li>민트를 땅에 심기 — 모든 걸 잠식</li>
+            <li>애호박 수확 타이밍 놓치기 — 매주 확인</li>
+          </ul>
+        </div>
+        <div class="companion-card" style="margin:0">
+          <h4 style="font-size:14px;font-family:'Nanum Myeongjo',serif">🌱 토양 & 비료 팁</h4>
+          <ul style="font-size:12px;line-height:1.9;color:var(--muted);padding-left:16px">
+            <li>심기 2주 전 퇴비 혼합 권장</li>
+            <li>토마토·피망: 칼슘·인 비료 추가</li>
+            <li>허브류: 비료 과하면 향이 줄어요</li>
+            <li>커뮤니티 가든 컴포스트 확인</li>
+            <li>pH 6.0-6.8이 대부분 채소에 최적</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-val" id="stat-selected">0</div>
+        <div class="stat-label">선택한 채소</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="stat-placed">0</div>
+        <div class="stat-label">심은 칸</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="stat-remaining">24</div>
+        <div class="stat-label">남은 칸</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="stat-earliest">-</div>
+        <div class="stat-label">첫 수확 예상</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom veg modal -->
+<div class="modal-backdrop" id="custom-modal" onclick="if(event.target===this)closeCustomModal()">
+  <div class="modal">
+    <h3>🌱 직접 채소·허브 추가</h3>
+    <div class="modal-row">
+      <label>이름</label>
+      <input type="text" id="custom-name" placeholder="예: 케일, 루꼴라, 로즈마리..." />
+    </div>
+    <div class="modal-row">
+      <label>아이콘 선택</label>
+      <div class="icon-picker" id="icon-picker"></div>
+    </div>
+    <div class="modal-row">
+      <label>수확까지 걸리는 기간 (일)</label>
+      <input type="number" id="custom-days" min="15" max="180" value="50" />
+    </div>
+    <div class="modal-row">
+      <label>심는 시기 (마지막 서리 기준)</label>
+      <select id="custom-timing">
+        <option value="cool">서리 전 가능 (서리 4주 전부터, 서늘한 작물)</option>
+        <option value="warm" selected>서리 후 (마지막 서리 1-2주 후)</option>
+        <option value="hot">따뜻해진 후 (마지막 서리 3-4주 후)</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <label>난이도</label>
+      <select id="custom-diff">
+        <option value="easy">쉬움</option>
+        <option value="med">보통</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeCustomModal()">취소</button>
+      <button class="modal-btn primary" onclick="addCustomVeg()">추가</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ Vegetable database ============
+const vegDB = [
+  // Existing
+  { id:'tomato',   icon:'🍅', name:'방울토마토', eng:'Cherry tomato', diff:'easy', days:60, color:'#D85A30', timing:'warm', aliases:['토마토','tomato','체리토마토'],
+    tip:'가장 인기 있는 초보자 채소! 캐이지(지지대)를 꼭 세워주고, 잎이 노래지면 물 부족 신호예요. 바질과 함께 심으면 더 잘 자라요.' },
+  { id:'cucumber', icon:'🥒', name:'오이',       eng:'Cucumber',      diff:'easy', days:50, color:'#639922', timing:'warm', aliases:['cucumber','노각'],
+    tip:'성장이 빠르고 수확이 많아 보람 있어요. 덩굴이 자라므로 트렐리스(격자망) 근처에 심으세요. 매일 확인하면 좋아요.' },
+  { id:'zucchini', icon:'🥬', name:'애호박',     eng:'Zucchini',      diff:'easy', days:45, color:'#1D9E75', timing:'warm', aliases:['주키니','zucchini','호박'],
+    tip:'정말 잘 자라요! 너무 잘 자라서 방심하면 굵어집니다. 작을 때 자주 수확해야 맛이 좋고 더 많이 열려요.' },
+  { id:'lettuce',  icon:'🥗', name:'상추',       eng:'Lettuce',       diff:'easy', days:30, color:'#97C459', timing:'cool', aliases:['lettuce','로메인'],
+    tip:'30일이면 솎아 먹기 시작! 더위에 약해서 그늘 지는 곳도 괜찮아요. 봄·가을 두 번 즐길 수 있어요.' },
+  { id:'spinach',  icon:'🌿', name:'시금치',     eng:'Spinach',       diff:'easy', days:35, color:'#3B6D11', timing:'cool', aliases:['spinach'],
+    tip:'서늘한 날씨를 좋아해요. 봄 초반·가을에 잘 자라고 여름엔 꽃대가 올라와요. 4월에 바로 심을 수 있어요!' },
+  { id:'pepper',   icon:'🫑', name:'피망',       eng:'Bell pepper',   diff:'med',  days:70, color:'#EF9F27', timing:'hot', aliases:['파프리카','bell pepper','pepper'],
+    tip:'토마토와 비슷하게 관리해요. 수확까지 시간이 걸리지만 한 그루에서 많이 나와요. 할라피뇨와는 50cm 이상 거리 유지!' },
+  { id:'jalapeno', icon:'🌶️', name:'할라피뇨',   eng:'Jalapeño',      diff:'med',  days:75, color:'#A32D2D', timing:'hot', aliases:['jalapeno','jalapeño','고추'],
+    tip:'피망과 같은 방식으로 관리해요. 초록색일 때 수확하면 아삭하고, 빨게지면 더 달고 매워요. 한 그루에서 20-30개 수확 가능!' },
+  { id:'basil',    icon:'🌱', name:'바질',       eng:'Basil',         diff:'easy', days:25, color:'#5DCAA5', timing:'warm', aliases:['basil'],
+    tip:'토마토 옆에 심으면 서로 잘 자라요. 꽃대가 올라오면 바로 잘라줘야 잎을 오래 수확해요.' },
+  { id:'parsley',  icon:'🌾', name:'파슬리',     eng:'Parsley',       diff:'easy', days:28, color:'#7F77DD', timing:'cool', aliases:['parsley'],
+    tip:'천천히 자라지만 한번 자리잡으면 오래 수확해요. 씨앗보다 모종 구매를 추천해요. 서리에도 꽤 강한 편이에요.' },
+  { id:'mint',     icon:'🍃', name:'민트',       eng:'Mint',          diff:'easy', days:20, color:'#3B8BD4', timing:'warm', aliases:['mint','페퍼민트'],
+    tip:'생명력이 매우 강해요! 화분에 따로 심거나, 땅에 심을 땐 격리판을 추천해요.' },
+  // Additional searchable items
+  { id:'kale',     icon:'🥬', name:'케일',       eng:'Kale',          diff:'easy', days:55, color:'#2D5C20', timing:'cool', aliases:['kale'],
+    tip:'서리에 강하고 오래 수확할 수 있어요. 늦가을까지 따 먹을 수 있고 서리 맞은 후 더 달아져요.' },
+  { id:'arugula',  icon:'🌿', name:'루꼴라',     eng:'Arugula',       diff:'easy', days:25, color:'#7DAB55', timing:'cool', aliases:['arugula','로켓'],
+    tip:'빠르게 자라는 잎채소예요. 파종 후 25일이면 수확! 더위에 약해 봄·가을 추천.' },
+  { id:'radish',   icon:'🌶️', name:'무',         eng:'Radish',        diff:'easy', days:30, color:'#E24B4A', timing:'cool', aliases:['radish','래디시','red radish'],
+    tip:'가장 빠르게 자라는 뿌리채소! 30일 내 수확 가능. 봄·가을 모두 좋아요.' },
+  { id:'carrot',   icon:'🥕', name:'당근',       eng:'Carrot',        diff:'med',  days:75, color:'#E27520', timing:'cool', aliases:['carrot'],
+    tip:'토양이 부드러워야 잘 자라요. 돌이나 흙덩이 있으면 모양 이상해져요. 새싹 솎기가 중요!' },
+  { id:'beet',     icon:'🟣', name:'비트',       eng:'Beet',          diff:'easy', days:55, color:'#7A1F4A', timing:'cool', aliases:['beet','beetroot'],
+    tip:'잎(비트그린)도 먹을 수 있어요. 뿌리 굵어지면 수확. 서늘한 날씨 좋아해요.' },
+  { id:'onion',    icon:'🧅', name:'양파',       eng:'Onion',         diff:'med',  days:100,color:'#C49A6C', timing:'cool', aliases:['onion'],
+    tip:'당근 옆에 심으면 좋아요. 잎이 쓰러지면 수확 신호. 보관성이 좋아 많이 심을 만해요.' },
+  { id:'garlic',   icon:'🧄', name:'마늘',       eng:'Garlic',        diff:'easy', days:240,color:'#E8DCC4', timing:'cool', aliases:['garlic'],
+    tip:'가을(10-11월)에 심어 다음해 6-7월에 수확. 손이 거의 안 가서 초보자에게 좋아요.' },
+  { id:'strawberry',icon:'🍓', name:'딸기',     eng:'Strawberry',    diff:'med',  days:90, color:'#E8425A', timing:'cool', aliases:['strawberry'],
+    tip:'다년생이라 한번 심으면 매년 수확 가능. 첫해는 꽃을 따주고 둘째 해부터 본격 수확.' },
+  { id:'cilantro', icon:'🌿', name:'고수',       eng:'Cilantro',      diff:'easy', days:35, color:'#8FBC55', timing:'cool', aliases:['cilantro','coriander','코리앤더'],
+    tip:'더위에 빨리 꽃대가 올라와요. 2주 간격으로 연속 파종하면 오래 수확 가능.' },
+  { id:'dill',     icon:'🌿', name:'딜',         eng:'Dill',          diff:'easy', days:40, color:'#A0C078', timing:'warm', aliases:['dill'],
+    tip:'오이 절임에 필수. 키가 1m까지 자라요. 씨앗도 향신료로 사용 가능.' },
+  { id:'chives',   icon:'🌱', name:'차이브',     eng:'Chives',        diff:'easy', days:30, color:'#6A9A4D', timing:'cool', aliases:['chives','쪽파'],
+    tip:'한번 심으면 매년 자라는 다년초. 잘라도 다시 자라요. 보라색 꽃도 예뻐요.' },
+  { id:'rosemary', icon:'🌿', name:'로즈마리',   eng:'Rosemary',      diff:'med',  days:90, color:'#5A7A6A', timing:'warm', aliases:['rosemary'],
+    tip:'다년생 허브. Michigan에선 화분에 심어 겨울엔 실내로 옮기는 게 안전해요.' },
+  { id:'thyme',    icon:'🌿', name:'타임',       eng:'Thyme',         diff:'easy', days:75, color:'#8A9670', timing:'warm', aliases:['thyme'],
+    tip:'다년생 허브. 건조한 토양 선호. 한번 심으면 몇 년간 수확 가능.' },
+  { id:'oregano',  icon:'🌿', name:'오레가노',   eng:'Oregano',       diff:'easy', days:80, color:'#8AA050', timing:'warm', aliases:['oregano'],
+    tip:'피자·파스타에 필수. 다년생이라 한번 자리잡으면 계속 수확. 햇빛 풍부한 곳 선호.' },
+  { id:'sage',     icon:'🌿', name:'세이지',     eng:'Sage',          diff:'easy', days:75, color:'#9AAE94', timing:'warm', aliases:['sage'],
+    tip:'다년생 허브. 추수감사절 요리에 필수. 건조한 토양과 충분한 햇빛 선호.' },
+  { id:'broccoli', icon:'🥦', name:'브로콜리',   eng:'Broccoli',      diff:'med',  days:80, color:'#3D7A45', timing:'cool', aliases:['broccoli'],
+    tip:'서늘한 날씨 좋아해요. 메인 봉우리 수확 후에도 곁순이 계속 나와요.' },
+  { id:'cabbage',  icon:'🥬', name:'양배추',     eng:'Cabbage',       diff:'med',  days:90, color:'#A8C570', timing:'cool', aliases:['cabbage'],
+    tip:'공간을 많이 차지해요(60cm). 토마토와는 멀리 떨어뜨려 심으세요.' },
+  { id:'corn',     icon:'🌽', name:'옥수수',     eng:'Corn',          diff:'med',  days:80, color:'#F5D547', timing:'hot', aliases:['corn','sweet corn'],
+    tip:'바람으로 수분되니 한 줄보다 블록(4×4 이상)으로 심어야 해요.' },
+  { id:'beans',    icon:'🫛', name:'강낭콩',     eng:'Bean',          diff:'easy', days:55, color:'#8AA15D', timing:'warm', aliases:['bean','beans','green bean'],
+    tip:'덩굴/덤불 두 종류. 토양에 질소를 공급해서 다음 해 작물에도 좋아요.' },
+  { id:'peas',     icon:'🫛', name:'완두콩',     eng:'Pea',           diff:'easy', days:60, color:'#9DBE5C', timing:'cool', aliases:['pea','peas','snap pea'],
+    tip:'서늘한 날씨 작물. 격자망 필요. 4월에 심을 수 있어요.' },
+  { id:'eggplant', icon:'🍆', name:'가지',       eng:'Eggplant',      diff:'med',  days:80, color:'#6B4080', timing:'hot', aliases:['eggplant'],
+    tip:'더위 좋아하는 작물. 따뜻해진 후(5월 말) 심어야 해요. 토마토와 비슷한 관리.' },
+  { id:'pumpkin',  icon:'🎃', name:'호박',       eng:'Pumpkin',       diff:'med',  days:110,color:'#E08438', timing:'warm', aliases:['pumpkin'],
+    tip:'엄청 넓게 퍼져요(2m+). half plot엔 안 맞아요. 큰 텃밭이나 모서리에.' },
+  { id:'watermelon',icon:'🍉',name:'수박',       eng:'Watermelon',    diff:'med',  days:90, color:'#3D7A45', timing:'hot', aliases:['watermelon'],
+    tip:'공간 많이 필요. Michigan은 일찍 심어야 가을 전 수확 가능. 5월 말 추천.' },
+  { id:'sweetpotato',icon:'🍠',name:'고구마',    eng:'Sweet potato',  diff:'med',  days:110,color:'#B8540F', timing:'hot', aliases:['sweet potato','고구마'],
+    tip:'따뜻해진 후 심어요. 덩굴이 길게 퍼지니 공간 충분히 확보.' },
+  { id:'potato',   icon:'🥔', name:'감자',       eng:'Potato',        diff:'easy', days:90, color:'#B8956A', timing:'cool', aliases:['potato'],
+    tip:'씨감자에서 시작. 흙을 자주 북돋아 줘야 해요. 잎이 시들면 수확 신호.' },
+  { id:'okra',     icon:'🌶️', name:'오크라',     eng:'Okra',          diff:'med',  days:60, color:'#7A9550', timing:'hot', aliases:['okra'],
+    tip:'더위 좋아함. 따뜻한 지역에서 잘 자라요. 매일 수확해야 부드러움 유지.' },
+  { id:'celery',   icon:'🌿', name:'셀러리',     eng:'Celery',        diff:'med',  days:120,color:'#A8C078', timing:'cool', aliases:['celery'],
+    tip:'물 많이 필요해요. 천천히 자라지만 향이 좋아 가치 있어요.' },
+  { id:'swisschard',icon:'🌿',name:'근대',       eng:'Swiss chard',   diff:'easy', days:50, color:'#C04545', timing:'cool', aliases:['chard','swiss chard'],
+    tip:'더위에 비교적 강해요. 잎 따 먹으면 계속 자라서 한 그루에서 오래 수확.' },
+];
+
+// User-added custom vegs
+let customVegs = [];
+
+function getAllVegs() {
+  return [...vegDB, ...customVegs];
+}
+
+// ============ Frost date database (USDA zones, simplified) ============
+// Source: based on average frost date data by ZIP code prefix
+const frostByZipPrefix = {
+  // Format: prefix: { name, zone, lastFrost: 'M-D', firstFrost: 'M-D' }
+  '0': { name: 'Northeast (CT, MA, ME, NH, NJ, RI, VT)', zone: '5b-6b', last: '5-15', first: '10-1' },
+  '1': { name: 'Northeast (NY, PA)', zone: '5a-7a', last: '5-1', first: '10-15' },
+  '2': { name: 'Mid-Atlantic (DC, DE, MD, NC, SC, VA, WV)', zone: '6a-8a', last: '4-15', first: '10-25' },
+  '3': { name: 'Southeast (AL, FL, GA, MS, TN)', zone: '7a-10a', last: '3-15', first: '11-15' },
+  '4': { name: 'Midwest (IN, KY, MI, OH)', zone: '5b-6b', last: '5-10', first: '10-15' },
+  '5': { name: 'Upper Midwest (IA, MN, MT, ND, SD, WI)', zone: '3b-5a', last: '5-20', first: '9-25' },
+  '6': { name: 'Central (IL, KS, MO, NE)', zone: '5b-6b', last: '4-25', first: '10-15' },
+  '7': { name: 'South Central (AR, LA, OK, TX)', zone: '7a-9a', last: '3-25', first: '11-1' },
+  '8': { name: 'Mountain West (AZ, CO, ID, NM, NV, UT, WY)', zone: '4a-7a', last: '5-5', first: '10-5' },
+  '9': { name: 'West Coast (AK, CA, HI, OR, WA)', zone: '5a-10b', last: '4-1', first: '11-15' },
+};
+
+// More specific overrides for common ZIP prefixes (3-digit)
+const frostByZip3 = {
+  '481': { name: 'Ann Arbor / SE Michigan', zone: '6a', last: '5-10', first: '10-15' }, // Ypsilanti area
+  '482': { name: 'Detroit Metro, MI', zone: '6a', last: '5-5', first: '10-20' },
+  '483': { name: 'Flint area, MI', zone: '5b', last: '5-15', first: '10-10' },
+  '494': { name: 'Grand Rapids, MI', zone: '6a', last: '5-10', first: '10-15' },
+  '498': { name: 'Northern Michigan', zone: '5a', last: '5-25', first: '9-25' },
+  '100': { name: 'New York City', zone: '7a', last: '4-15', first: '11-1' },
+  '021': { name: 'Boston, MA', zone: '6b', last: '4-20', first: '10-25' },
+  '606': { name: 'Chicago, IL', zone: '6a', last: '4-25', first: '10-20' },
+  '900': { name: 'Los Angeles, CA', zone: '10b', last: '1-15', first: '12-15' },
+  '941': { name: 'San Francisco, CA', zone: '10a', last: '1-20', first: '12-20' },
+  '981': { name: 'Seattle, WA', zone: '8b', last: '3-25', first: '11-15' },
+  '972': { name: 'Portland, OR', zone: '8b', last: '4-1', first: '11-15' },
+  '852': { name: 'Phoenix, AZ', zone: '9b', last: '2-1', first: '12-15' },
+  '787': { name: 'Austin, TX', zone: '8b', last: '3-1', first: '11-25' },
+  '331': { name: 'Miami, FL', zone: '10b', last: 'none', first: 'none' },
+  '802': { name: 'Denver, CO', zone: '5b', last: '5-5', first: '10-5' },
+  '550': { name: 'Minneapolis, MN', zone: '4b', last: '5-10', first: '10-1' },
+  '631': { name: 'St. Louis, MO', zone: '6b', last: '4-15', first: '10-25' },
+  '300': { name: 'Atlanta, GA', zone: '7b', last: '4-1', first: '11-5' },
+};
+
+let userLocation = { name: 'Michigan (기본값)', zone: '6a', lastFrost: '5-10', firstFrost: '10-15' };
+
+function lookupZip() {
+  const zip = document.getElementById('zip-input').value.trim();
+  if (!/^\d{5}$/.test(zip)) {
+    alert('5자리 우편번호를 입력해주세요 (예: 48104)');
+    return;
+  }
+  const zip3 = zip.substring(0, 3);
+  const zip1 = zip.substring(0, 1);
+  let info;
+  if (frostByZip3[zip3]) {
+    info = frostByZip3[zip3];
+  } else if (frostByZipPrefix[zip1]) {
+    info = frostByZipPrefix[zip1];
+  } else {
+    alert('해당 우편번호를 찾을 수 없어요.');
+    return;
+  }
+  userLocation = {
+    name: info.name + ' (' + zip + ')',
+    zone: info.zone,
+    lastFrost: info.last,
+    firstFrost: info.first,
+  };
+  document.getElementById('location-display').innerHTML =
+    `📍 <strong>${info.name}</strong> · 존 ${info.zone} · 봄 서리 ${formatDate(info.last)} · 가을 서리 ${formatDate(info.first)}`;
+  updateAll();
+}
+
+function formatDate(mdStr) {
+  if (mdStr === 'none') return '서리 없음';
+  const [m, d] = mdStr.split('-').map(Number);
+  return `${m}월 ${d}일`;
+}
+
+function frostMD(mdStr) {
+  if (mdStr === 'none') return null;
+  const [m, d] = mdStr.split('-').map(Number);
+  return new Date(2025, m - 1, d);
+}
+
+function addDays(date, days) {
+  const r = new Date(date);
+  r.setDate(r.getDate() + days);
+  return r;
+}
+
+function fmtMD(date) {
+  if (!date) return '-';
+  return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+}
+
+function getPlantDate(veg) {
+  const lf = frostMD(userLocation.lastFrost);
+  if (!lf) return new Date(2025, 0, 15); // tropical
+  if (veg.timing === 'cool') return addDays(lf, -28);  // 4 weeks before
+  if (veg.timing === 'warm') return addDays(lf, 7);    // 1 week after
+  if (veg.timing === 'hot') return addDays(lf, 21);    // 3 weeks after
+  return addDays(lf, 7);
+}
+
+function getHarvestStart(veg) {
+  return addDays(getPlantDate(veg), veg.days);
+}
+
+function getHarvestEnd(veg) {
+  // Harvest until first frost (for warm crops) or extended (for cool crops in fall)
+  const ff = frostMD(userLocation.firstFrost);
+  if (!ff) return addDays(getHarvestStart(veg), 90);
+  if (veg.timing === 'cool') return addDays(ff, 14); // some tolerate light frost
+  return addDays(ff, -7);
+}
+
+// ============ Plot size ============
+let plotConfig = { cols: 6, rows: 4, label: '6 × 4', meters: '2.4m × 1.8m' };
+const plotSizes = {
+  '3x4':  { cols: 3, rows: 4, label: '3 × 4',  meters: '1.2m × 1.6m' },
+  '4x4':  { cols: 4, rows: 4, label: '4 × 4',  meters: '1.6m × 1.6m' },
+  '6x4':  { cols: 6, rows: 4, label: '6 × 4',  meters: '2.4m × 1.6m' },
+  '6x6':  { cols: 6, rows: 6, label: '6 × 6',  meters: '2.4m × 2.4m' },
+  '8x6':  { cols: 8, rows: 6, label: '8 × 6',  meters: '3.2m × 2.4m' },
+  '10x8': { cols: 10,rows: 8, label: '10 × 8', meters: '4m × 3.2m' },
+};
+let plotCells = Array(24).fill(null);
+
+function changePlotSize() {
+  const key = document.getElementById('size-select').value;
+  const cfg = plotSizes[key];
+  const newSize = cfg.cols * cfg.rows;
+  // Preserve existing cells where possible
+  const oldCells = [...plotCells];
+  plotCells = Array(newSize).fill(null);
+  for (let i = 0; i < Math.min(oldCells.length, newSize); i++) {
+    plotCells[i] = oldCells[i];
+  }
+  plotConfig = cfg;
+  document.getElementById('size-label').textContent = cfg.label;
+  document.getElementById('cell-count').textContent = newSize;
+  document.getElementById('size-meters').textContent = cfg.meters;
+  document.getElementById('left-label').textContent = cfg.meters.split(' × ')[1];
+  renderPlotGrid();
+  updateStats();
+}
+
+// ============ State ============
+let selected = new Set(['tomato', 'basil', 'lettuce', 'jalapeno']);
+let plotSelected = null;
+
+// ============ Sidebar ============
+function renderSidebar() {
+  const list = document.getElementById('veg-list');
+  const allVegs = getAllVegs();
+  const selectedList = allVegs.filter(v => selected.has(v.id));
+  document.getElementById('sel-count').textContent = selectedList.length;
+
+  if (!selectedList.length) {
+    list.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:8px;text-align:center">위에서 검색하거나 추가해보세요</div>';
+    return;
+  }
+
+  list.innerHTML = selectedList.map(v => `
+    <div class="veg-card selected" onclick="onVegClick(event,'${v.id}')">
+      <span class="icon">${v.icon}</span>
+      <div class="info">
+        <div class="name">${v.name}
+          <span class="badge-${v.diff}">${v.diff==='easy'?'쉬움':'보통'}</span>
+          ${v.custom ? '<span class="badge-custom">직접</span>' : ''}
+        </div>
+        <div class="sub">${v.eng} · ${v.days}일</div>
+      </div>
+      <div class="dot" style="background:${v.color}"></div>
+      <span class="delete-x" onclick="removeVeg(event,'${v.id}')" title="제거">×</span>
+    </div>
+  `).join('');
+}
+
+function onVegClick(e, id) {
+  if (e.target.classList.contains('delete-x')) return;
+  showTip(id);
+}
+
+function removeVeg(e, id) {
+  e.stopPropagation();
+  selected.delete(id);
+  plotCells.forEach((c, i) => { if (c === id) plotCells[i] = null; });
+  if (plotSelected === id) plotSelected = null;
+  updateAll();
+}
+
+function addVeg(id) {
+  selected.add(id);
+  showTip(id);
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').innerHTML = '';
+  updateAll();
+}
+
+function showTip(id) {
+  const v = getAllVegs().find(x => x.id === id);
+  if (!v) return;
+  document.getElementById('tip-panel').innerHTML = `<strong>${v.icon} ${v.name}</strong>${v.tip}`;
+}
+
+// ============ Search ============
+function onSearch() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const resultsEl = document.getElementById('search-results');
+  if (!q) { resultsEl.innerHTML = ''; return; }
+
+  const allVegs = getAllVegs();
+  const matches = allVegs.filter(v => {
+    const haystack = [v.name, v.eng, ...(v.aliases || [])].join(' ').toLowerCase();
+    return haystack.includes(q) && !selected.has(v.id);
+  }).slice(0, 6);
+
+  if (!matches.length) {
+    resultsEl.innerHTML = `
+      <div class="search-empty">
+        "${q}"에 맞는 항목이 없어요.<br>
+        <span style="color:var(--soil)">↓ "직접 추가하기"로 등록해보세요</span>
+      </div>`;
+    return;
+  }
+
+  resultsEl.innerHTML = `<div class="search-results">${
+    matches.map(v => `
+      <div class="search-result-item" onclick="addVeg('${v.id}')">
+        <span><span style="font-size:14px">${v.icon}</span> ${v.name} <span style="color:var(--muted);font-size:10px">${v.eng}</span></span>
+        <span class="add-icon">＋</span>
+      </div>`).join('')
+  }</div>`;
+}
+
+// ============ Custom modal ============
+const ICON_OPTIONS = ['🌱','🌿','🌾','🥬','🥦','🥕','🥔','🧅','🧄','🍅','🍆','🌶️','🌽','🥒','🫑','🥗','🍓','🫐','🍇','🍋','🍊','🥑','🥥','🌻','🌷','🍄','🌳','🌲'];
+let selectedIcon = '🌱';
+
+function openCustomModal() {
+  document.getElementById('custom-modal').classList.add('show');
+  document.getElementById('custom-name').value = document.getElementById('search-input').value;
+  document.getElementById('custom-name').focus();
+  selectedIcon = '🌱';
+  renderIconPicker();
+}
+
+function closeCustomModal() {
+  document.getElementById('custom-modal').classList.remove('show');
+}
+
+function renderIconPicker() {
+  const picker = document.getElementById('icon-picker');
+  picker.innerHTML = ICON_OPTIONS.map(icon =>
+    `<div class="icon-option ${icon === selectedIcon ? 'selected' : ''}" onclick="pickIcon('${icon}')">${icon}</div>`
+  ).join('');
+}
+
+function pickIcon(icon) {
+  selectedIcon = icon;
+  renderIconPicker();
+}
+
+const CUSTOM_COLORS = ['#D85A30', '#639922', '#1D9E75', '#97C459', '#3B6D11', '#EF9F27', '#A32D2D', '#5DCAA5', '#7F77DD', '#3B8BD4', '#7A1F4A', '#E27520'];
+
+function addCustomVeg() {
+  const name = document.getElementById('custom-name').value.trim();
+  const days = parseInt(document.getElementById('custom-days').value, 10);
+  const timing = document.getElementById('custom-timing').value;
+  const diff = document.getElementById('custom-diff').value;
+
+  if (!name) { alert('이름을 입력해주세요'); return; }
+  if (isNaN(days) || days < 15 || days > 365) { alert('수확 기간을 확인해주세요 (15-365일)'); return; }
+
+  const id = 'custom_' + Date.now();
+  const color = CUSTOM_COLORS[customVegs.length % CUSTOM_COLORS.length];
+
+  const newVeg = {
+    id, name, eng: name, icon: selectedIcon, diff, days, timing, color,
+    custom: true,
+    aliases: [name.toLowerCase()],
+    tip: `직접 추가한 항목이에요. 일반 텃밭 작물 가이드를 참고해주세요. (${timing === 'cool' ? '서늘한 작물' : timing === 'hot' ? '따뜻한 작물' : '일반 작물'}, 약 ${days}일 소요)`
+  };
+
+  customVegs.push(newVeg);
+  selected.add(id);
+  closeCustomModal();
+  updateAll();
+  showTip(id);
+}
+
+// ============ Palette ============
+function renderPalette() {
+  const palette = document.getElementById('palette');
+  const selVegs = getAllVegs().filter(v => selected.has(v.id));
+  if (!selVegs.length) {
+    palette.innerHTML = '<span style="font-size:12px;color:var(--muted)">← 왼쪽에서 채소를 선택하세요</span>';
+    return;
+  }
+  palette.innerHTML = selVegs.map(v => `
+    <div class="palette-chip ${plotSelected === v.id ? 'active' : ''}"
+         style="${plotSelected === v.id ? `border-color:${v.color};box-shadow:2px 2px 0 ${v.color}44` : ''}"
+         onclick="selectForPlot('${v.id}')">
+      <span>${v.icon}</span><span>${v.name}</span>
+    </div>
+  `).join('');
+}
+
+function selectForPlot(id) {
+  plotSelected = plotSelected === id ? null : id;
+  renderPalette();
+}
+
+// ============ Plot grid ============
+function renderPlotGrid() {
+  const grid = document.getElementById('plot-grid');
+  grid.style.gridTemplateColumns = `repeat(${plotConfig.cols}, 1fr)`;
+  const total = plotConfig.cols * plotConfig.rows;
+  grid.innerHTML = '';
+  const allVegs = getAllVegs();
+
+  for (let i = 0; i < total; i++) {
+    const vId = plotCells[i];
+    const v = vId ? allVegs.find(x => x.id === vId) : null;
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (v ? ' filled' : '');
+    if (v) {
+      cell.style.background = v.color + '33';
+      cell.style.borderColor = v.color + '88';
+      cell.innerHTML = `<span class="emoji">${v.icon}</span><span class="cell-remove" onclick="removeCell(event,${i})">×</span>`;
+    }
+    cell.onclick = () => placeVeg(i);
+    grid.appendChild(cell);
+  }
+
+  // Legend
+  const used = [...new Set(plotCells.filter(Boolean))];
+  const legendEl = document.getElementById('plot-legend');
+  legendEl.innerHTML = used.length ? used.map(id => {
+    const v = allVegs.find(x => x.id === id);
+    if (!v) return '';
+    const count = plotCells.filter(c => c === id).length;
+    return `<div class="legend-item"><div class="legend-dot" style="background:${v.color}"></div>${v.icon} ${v.name} × ${count}칸</div>`;
+  }).join('') : '';
+}
+
+function placeVeg(idx) {
+  if (!plotSelected) return;
+  plotCells[idx] = plotSelected;
+  renderPlotGrid();
+  updateStats();
+}
+
+function removeCell(e, idx) {
+  e.stopPropagation();
+  plotCells[idx] = null;
+  renderPlotGrid();
+  updateStats();
+}
+
+// ============ Calendar tab ============
+function renderCalendar() {
+  document.getElementById('cal-location').textContent = userLocation.name;
+  document.getElementById('cal-zone').textContent = userLocation.zone;
+  document.getElementById('cal-last-frost').textContent = formatDate(userLocation.lastFrost);
+  document.getElementById('cal-first-frost').textContent = formatDate(userLocation.firstFrost);
+
+  const lf = frostMD(userLocation.lastFrost);
+  const ff = frostMD(userLocation.firstFrost);
+  if (lf && ff) {
+    const diff = Math.round((ff - lf) / (1000 * 60 * 60 * 24));
+    document.getElementById('cal-season').textContent = `약 ${diff}일`;
+  } else {
+    document.getElementById('cal-season').textContent = '연중';
+  }
+
+  renderTimeline();
+  renderTipsCalendar();
+}
+
+function renderTimeline() {
+  const container = document.getElementById('timeline-container');
+  const allVegs = getAllVegs();
+  const selVegs = allVegs.filter(v => selected.has(v.id));
+
+  if (!selVegs.length) {
+    container.innerHTML = '<div class="empty-msg">← 왼쪽에서 채소를 먼저 선택하세요</div>';
+    return;
+  }
+
+  const yearStart = new Date(2025, 0, 1);
+  const yearEnd = new Date(2025, 11, 31);
+  const totalDays = (yearEnd - yearStart) / (1000 * 60 * 60 * 24);
+  const pct = (date) => Math.max(0, Math.min(100, ((date - yearStart) / (1000 * 60 * 60 * 24)) / totalDays * 100));
+
+  let html = `
+    <div class="timeline-month-labels">
+      <div></div>
+      <div class="timeline-months">
+        <span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span>
+        <span>7월</span><span>8월</span><span>9월</span><span>10월</span><span>11월</span><span>12월</span>
+      </div>
+    </div>
+    <div class="timeline">
+  `;
+
+  for (const v of selVegs) {
+    const plant = getPlantDate(v);
+    const harvestStart = getHarvestStart(v);
+    const harvestEnd = getHarvestEnd(v);
+    const plantPct = pct(plant);
+    const startPct = pct(harvestStart);
+    const endPct = pct(harvestEnd);
+
+    html += `
+      <div class="timeline-row">
+        <div class="timeline-name"><span class="icon">${v.icon}</span>${v.name}</div>
+        <div class="timeline-bar-wrap">
+          <div class="timeline-bar" style="left:${plantPct}%;width:${Math.max(0, startPct - plantPct)}%;background:${v.color}"></div>
+          <div class="timeline-bar harvest-bar" style="left:${startPct}%;width:${Math.max(0, endPct - startPct)}%;background:${v.color}"></div>
+          <div style="position:absolute;top:50%;transform:translateY(-50%);left:${plantPct}%;width:2px;height:18px;background:var(--soil);" title="심기"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>
+    <div class="timeline-legend">
+      <div class="timeline-legend-item"><div style="width:2px;height:14px;background:var(--soil)"></div>심는 날</div>
+      <div class="timeline-legend-item"><div class="timeline-legend-swatch" style="background:#D85A30;opacity:0.3"></div>성장 기간</div>
+      <div class="timeline-legend-item"><div class="timeline-legend-swatch" style="background:#D85A30;opacity:0.8"></div>수확 기간</div>
+    </div>`;
+
+  container.innerHTML = html;
+}
+
+function renderTipsCalendar() {
+  const lf = frostMD(userLocation.lastFrost);
+  const ff = frostMD(userLocation.firstFrost);
+  const tipsEl = document.getElementById('tips-calendar');
+
+  if (!lf || !ff) {
+    tipsEl.innerHTML = '연중 재배 가능한 지역이에요. 우편번호를 다시 확인해주세요.';
+    return;
+  }
+
+  const fourWeeksBefore = addDays(lf, -28);
+  const oneWeekAfter = addDays(lf, 7);
+  const threeWeeksAfter = addDays(lf, 21);
+  const beforeFirstFrost = addDays(ff, -14);
+
+  tipsEl.innerHTML = `
+    <div><strong style="color:var(--soil)">${fmtMD(fourWeeksBefore)}~</strong> 서늘한 작물 직파 (상추, 시금치, 무, 완두콩)</div>
+    <div><strong style="color:var(--soil)">${fmtMD(addDays(lf, -7))}~</strong> 허브류 모종 이식 시작</div>
+    <div><strong style="color:var(--soil)">${fmtMD(lf)}</strong> 마지막 서리 (예상)</div>
+    <div><strong style="color:var(--soil)">${fmtMD(oneWeekAfter)}~</strong> 토마토, 오이, 애호박, 바질 이식</div>
+    <div><strong style="color:var(--soil)">${fmtMD(threeWeeksAfter)}~</strong> 피망, 할라피뇨, 가지 이식</div>
+    <div><strong style="color:var(--soil)">${fmtMD(beforeFirstFrost)}~</strong> 가을 작물 마무리, 서리 대비</div>
+    <div><strong style="color:var(--soil)">${fmtMD(ff)}</strong> 첫 서리 (예상) — 시즌 종료</div>
+  `;
+}
+
+// ============ Harvest tab ============
+function renderHarvest() {
+  const tbody = document.getElementById('harvest-tbody');
+  const selVegs = getAllVegs().filter(v => selected.has(v.id)).sort((a, b) => a.days - b.days);
+
+  document.getElementById('harvest-frost-info').textContent =
+    `${userLocation.name} · 마지막 서리 ${formatDate(userLocation.lastFrost)} 기준`;
+
+  if (!selVegs.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">← 왼쪽에서 채소를 선택하세요</td></tr>`;
+    return;
+  }
+  const max = Math.max(...selVegs.map(v => v.days));
+  tbody.innerHTML = selVegs.map(v => {
+    const plant = getPlantDate(v);
+    const harvestStart = getHarvestStart(v);
+    const harvestEnd = getHarvestEnd(v);
+    return `
+    <tr class="harvest-row-tr">
+      <td><div class="h-name-cell"><span class="h-icon">${v.icon}</span><div><div class="h-name">${v.name}</div><div class="h-eng">${v.eng}</div></div></div></td>
+      <td data-label="기간 비교"><div class="h-bar-wrap"><div class="h-bar" style="width:${v.days/max*100}%;background:${v.color}"></div></div></td>
+      <td class="h-days" data-label="수확까지">${v.days}일</td>
+      <td class="h-date" data-label="심는 날">${fmtMD(plant)}</td>
+      <td class="h-date" data-label="첫 수확" style="color:var(--soil);font-weight:500">${fmtMD(harvestStart)}</td>
+      <td class="h-date" data-label="마지막 수확">${fmtMD(harvestEnd)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ============ Stats ============
+function updateStats() {
+  const placed = plotCells.filter(Boolean).length;
+  const total = plotConfig.cols * plotConfig.rows;
+  const earliest = getAllVegs().filter(v => selected.has(v.id))
+    .map(v => ({ ...v, harvestDate: getHarvestStart(v) }))
+    .sort((a, b) => a.harvestDate - b.harvestDate)[0];
+
+  document.getElementById('stat-selected').textContent = selected.size;
+  document.getElementById('stat-placed').textContent = placed;
+  document.getElementById('stat-remaining').textContent = total - placed;
+  document.getElementById('stat-earliest').textContent = earliest ? fmtMD(earliest.harvestDate) : '-';
+}
+
+// ============ Tabs ============
+function showTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) =>
+    b.classList.toggle('active', ['plot', 'calendar', 'harvest', 'tips'][i] === name));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ============ Mobile sidebar toggle ============
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const isOpen = sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show', isOpen);
+}
+
+// Auto-close sidebar on mobile when adding/selecting a veg
+function maybeCloseSidebar() {
+  if (window.innerWidth <= 900) {
+    const sidebar = document.querySelector('.sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('show');
+  }
+}
+
+function updateMenuBadge() {
+  const badge = document.getElementById('menu-badge');
+  if (badge) badge.textContent = selected.size;
+}
+
+// ============ Update everything ============
+function updateAll() {
+  renderSidebar();
+  renderPalette();
+  renderPlotGrid();
+  renderCalendar();
+  renderHarvest();
+  updateStats();
+  updateMenuBadge();
+}
+
+// ============ Init ============
+updateAll();
+showTip('tomato');
+</script>
+</body>
+</html>
